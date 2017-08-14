@@ -8,7 +8,14 @@ class Entity:
             self.x = x
             self.y = y
             self.walkable = walkable
+
     # update function
     # should be implemented by each child class of Entity
     def update(self):
+        pass
+
+    def render(self, surface, tile_size):
+        pass
+
+    def touch(self, other):
         pass

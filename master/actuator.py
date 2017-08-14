@@ -2,13 +2,10 @@ import numpy as np
 
 # Actuator of an agent (incomplete) 
 class Actuator:
-    def __init__(self, world):
-        self.world = world
-        self.sensors = []
+    def __init__(self, agent):
+        self.agent = agent
         self.goal = None
-
-    def addsensor(self, sensor):
-        self.sensors.append(sensor)
+        self.steps = []
 
     #reorient and find a new goal
     def reflect(self):
@@ -16,26 +13,27 @@ class Actuator:
         targets = []
         weights = []
 
-        for sensor in self.sensors:
-            ts, ws = sensor.sense(world, self.x, self.y)
+        for sensor in self.agent.sensors:
+            ts, ws = sensor.sense(self.agent.world, self.agent.x, self.agent.y)
             targets += ts
             weights += ws
 
         #nothing found => stay idle
         if len(targets) == 0:
             self.goal = None
+            self.steps = []
             return
 
+        return
         #choose random target according to weight
         z = np.sum(weights)
         self.goal = np.random.choice(targets, p = np.asarray(weights) / z)
-
             
 # act function. Randomly moves agent in one direction.
 # receives x,y, the current coordinates of the agent
 # returns new coordinates
     def propose(self, x, y):
-        if self.goal == None:
+        if self.goal == None or len(self.steps) == 0:
             r = np.random.randint(0, 5)
             # North
             if r == 1:
@@ -54,4 +52,13 @@ class Actuator:
                 x = x - 1
                 y = y
             self.reflect()
-            return (x, y)
+        else:   
+            step = self.steps[0]
+            x = step[0]
+            y = step[1]
+            self.steps = self.steps[1:]
+            #We have reached our goal
+            if len(self.steps) == 0:   
+                self.agent.touch(self.goal)
+                self.goal = None
+        return (x, y)

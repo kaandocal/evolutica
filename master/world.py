@@ -1,33 +1,39 @@
 from .agent import Agent
 from .food import Food
-from .entityType import EntityType
 from .entity import Entity
+from .gfx import load_image
 import pickle
 import numpy as np
+import pygame
 
 #represents the world grid with all entities
 class World:
     TILE_WALL = 1
 
-    def __init__(self, w, h):
-        self.width = w
-        self.height = h
+    def __init__(self, filename):
+        worldmap = load_image(filename, (0,0))
+        worldmap = worldmap.convert(8)
+        self.width, self.height = worldmap.get_size()
 
         #world array which contains the entities and its copy
         self.entities = []
+        self.remove_list = []
         self.tiles = np.zeros((self.width,self.height),dtype='uint32')
 
         #build wall around world
         self.tiles[0,:] = self.tiles[-1,:] = World.TILE_WALL
         self.tiles[:,0] = self.tiles[:,-1] = World.TILE_WALL
 
-        print(self.tiles)
+        for i in range(self.width):
+            for j in range(self.height):
+                if worldmap.get_at((i,j)) != (0,0,0):
+                    self.tiles[i,j] = World.TILE_WALL
 
     def walkable(self, x, y):
         return self.tiles[x,y] != World.TILE_WALL
 
     # Spawns entities
-    def spawn(self, type, x, y):
+    def spawn(self, constructor, x, y):
         if x < 0 or x >= self.width or y < 0 or y >= self.height:
             print("Warning: Trying to spawn entity outside world")
             return
@@ -35,20 +41,26 @@ class World:
         #avoid spawning entities in walls
         if self.tiles[x,y] == World.TILE_WALL:
             pass
+        
+        ent = constructor(self,x,y)
+        self.entities.append(ent)
+        return ent
 
-        if type == EntityType.Agent:
-            self.entities.append(Agent(self, x,y))
-        elif type == EntityType.Food:
-            self.entities.append(Food(self,x,y))
-        else:
-            print("ERROR: Entity could not be spawned, type '{}' doesn't exist".format(type))
+    def remove_entity(self, ent):
+        self.remove_list.append(ent)
 
     #updates all entities and the world grid
     def update(self):
         #call the update method of all entities in the world
         for entity in self.entities:
             entity.update()
+            for e2 in self.entities:
+                if e2 is not entity and entity.x == e2.x and entity.y == e2.y:
+                    entity.touch(e2)
 
+        for ent in self.remove_list:
+            self.entities.remove(ent) 
+        self.remove_list = []
         return
 
     def dump(self):
