@@ -88,3 +88,8 @@ class World:
         for ent in self.entities:
             if ent.type == Agent:
                 ent.dumpfood()
+
+    def sensorinfo(self):
+        for ent in self.entities:
+            if ent.type == Agent:
+                ent.dumpsensors()

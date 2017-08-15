@@ -9,7 +9,7 @@ from master.gfx import load_image
 from master.entity import Entity
 from master.world import World
 from master.agent import Agent
-from master.sensor import Smell
+from master.sensor import Nose, Ear
 from master.food import Food
 import master.gfx
 
@@ -36,11 +36,11 @@ wall_image = load_image("wall")
 #initialize world
 world = World('world')
 smart_one = world.spawn(Agent, 5, 5)
-nose = Smell(resolution=5)
+nose = Nose(resolution=5)
 smart_one.addsensor(nose)
 world.spawn(Agent, 5, 6)
 smart_one = world.spawn(Agent, 20, 20)
-nose = Smell(resolution=12)
+nose = Nose(resolution=12)
 smart_one.addsensor(nose)
 
 #set up display
@@ -75,6 +75,8 @@ while True:
             #dump game data
             elif key == K_s:
                 world.dump()
+            elif key == K_i:
+                world.sensorinfo()
             elif key == K_f:
                 world.foodinfo()
     #draw grid

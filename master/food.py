@@ -11,6 +11,8 @@ class Food(Entity):
         self.nutritional_value = nutritional_value
         self.kind = kind
         self.image = load_image("food")
+        self.smells = True
+        self.sounds = True
 
     def disappear(self):
         self.world.remove_entity(self)
@@ -22,7 +24,7 @@ class Food(Entity):
         if self.world.round >= self.bday + self.shelflife:
             self.disappear()
 
-rpf = 25
+rpf = 10
 
 class Distributor:
     def __init__(self, world):
