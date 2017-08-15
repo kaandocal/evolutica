@@ -33,7 +33,7 @@ class World:
                     self.tiles[i,j] = World.TILE_WALL
 
     def walkable(self, x, y):
-        return self.tiles[x,y] != World.TILE_WALL
+        return (x >= 0 and x < self.width) and (y >= 0 and y < self.height) and self.tiles[x,y] != World.TILE_WALL
 
     # Spawns entities
     def spawn(self, constructor, x, y, *args, **kwargs):
@@ -62,7 +62,8 @@ class World:
                     entity.touch(e2)
 
         for ent in self.remove_list:
-            self.entities.remove(ent) 
+            if ent in self.entities:
+                self.entities.remove(ent) 
         self.remove_list = []
         self.distributor.update()
         self.round += 1

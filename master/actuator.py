@@ -24,16 +24,16 @@ class Actuator:
             self.steps = []
             return
 
-        return
         #choose random target according to weight
         z = np.sum(weights)
         self.goal = np.random.choice(targets, p = np.asarray(weights) / z)
+        self.steps = self.pathfind()
 
     def pathfind(self):
         dest= None
         fringe= []
         closed= []
-        heapq.heappush(fringe,(self.estimateddistance(self.x, self.y),(self.x, self.y, 0, None)))
+        heapq.heappush(fringe,(self.estimateddistance(self.agent.x, self.agent.y),(self.agent.x, self.agent.y, 0, None)))
         while len(fringe)!=0:
             f, cell = heapq.heappop(fringe)
             closed.append((cell[0],cell[1]))
@@ -45,12 +45,12 @@ class Actuator:
             for n in nbs:
 
                 if self.agent.world.walkable(n[0], n[1]) == True and (n[0],n[1]) not in closed:
-                    f=n[2]+estimateddistance(n[0], n[1])
+                    f=n[2]+self.estimateddistance(n[0], n[1])
                     heapq.heappush(fringe,(f,n))
             
 
         if dest == None:
-            return None
+            return []
 
         ret=[]
         while True:
@@ -58,7 +58,8 @@ class Actuator:
             dest= dest[3]
             if dest== None:
                 break
-        return ret.reverse()
+        ret.reverse()
+        return ret
 
 
     def estimateddistance(self, xcur, ycur):

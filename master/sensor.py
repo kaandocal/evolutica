@@ -29,7 +29,6 @@ class Smell(Sensor):
         return targets, weights
 
     def render(self, surf, tile_size, x, y):
-        return
         temp_surf = pygame.Surface(surf.get_size())
         xpos = int((x + 0.5) * tile_size)
         ypos = int((y + 0.5) * tile_size)

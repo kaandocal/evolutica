@@ -1,5 +1,4 @@
 from .entity import Entity
-from .entityType import EntityType
 from .actuator import Actuator
 from .sensor import Sensor
 from .food import Food
