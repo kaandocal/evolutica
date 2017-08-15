@@ -8,6 +8,32 @@ class Actuator:
         self.steps = []
 
     #reorient and find a new goal
+    def doubt(self):
+        print("{} is starting to have some doubts...".format(self.agent.name))
+        #check sensor inputs and create list of potential targets and weights
+        targets = []
+        weights = []
+
+        for sensor in self.agent.sensors:
+            if sensor.type.name == "Brain":
+                continue
+
+            ts, ws = sensor.sense(self.agent.x, self.agent.y)
+            targets += ts
+            weights += ws
+
+        #nothing found => stay idle
+        if len(targets) == 0:
+            return
+
+        #choose random target according to weight
+        z = np.sum(weights)
+        self.goal = np.random.choice(targets, p = np.asarray(weights) / z)
+        self.steps = self.pathfind()
+        print("{} found {}!".format(self.agent.name, self.goal.name))
+
+
+    #reorient and find a new goal
     def reflect(self):
         #check sensor inputs and create list of potential targets and weights
         targets = []
@@ -27,33 +53,41 @@ class Actuator:
         #choose random target according to weight
         z = np.sum(weights)
         self.goal = np.random.choice(targets, p = np.asarray(weights) / z)
+        self.steps = self.pathfind()
         if self.goal.type == None:
             print("{} wonders what's at ({},{})...".format(self.agent.name, self.goal.x,self.goal.y))
         else:
             print("{} found {}!".format(self.agent.name, self.goal.name))
-        self.steps = self.pathfind()
 
     def pathfind(self):
         dest = None
         fringe = []
         closed = set()
-        heapq.heappush(fringe,(self.estimateddistance(self.agent.x, self.agent.y),(self.agent.x, self.agent.y, 0, None)))
+        pathdata = {}
+        heapq.heappush(fringe,(self.estimateddistance(self.agent.x, self.agent.y),(self.agent.x, self.agent.y)))
+        pathdata[(self.agent.x,self.agent.y)] = (0,None)
         while len(fringe) != 0:
             f, cell = heapq.heappop(fringe)
-            closed.add((cell[0],cell[1]))
+            closed.add(cell)
             if cell[0] == self.goal.x and cell[1] == self.goal.y:
                 dest=cell
                 break
 
-            nbs = ((cell[0], cell[1]+1,cell[2]+1,cell),\
-                   (cell[0]+1, cell[1],cell[2]+1,cell),\
-                   (cell[0]-1, cell[1],cell[2]+1,cell),\
-                   (cell[0], cell[1]-1,cell[2]+1,cell))
+            nbs = ((cell[0], cell[1]+1),\
+                   (cell[0]+1, cell[1]),\
+                   (cell[0]-1, cell[1]),\
+                   (cell[0], cell[1]-1))
 
             for n in nbs:
                 if self.agent.world.walkable(n[0], n[1]) == True and (n[0],n[1]) not in closed:
-                    f=n[2]+self.estimateddistance(n[0], n[1])
+                    if (f,cell) in fringe:
+                        continue
+
+                    g = pathdata[cell][0] + 1
+                    h = self.estimateddistance(n[0], n[1])
+                    f = g + h
                     heapq.heappush(fringe,(f,n))
+                    pathdata[n] = (g,cell)
             
 
         if dest == None:
@@ -62,7 +96,7 @@ class Actuator:
         ret=[]
         while True:
             ret.append((dest[0],dest[1]))
-            dest = dest[3]
+            dest = pathdata[dest][1]
             if dest == None:
                 break
 
@@ -98,6 +132,10 @@ class Actuator:
                 y = y
             self.reflect()
         else:   
+            if self.goal.type == None:
+                a = min(0, 300 - self.agent.energy) / 300.0
+                if np.random.random_sample() <= a:
+                    self.doubt()
             step = self.steps[0]
             x = step[0]
             y = step[1]

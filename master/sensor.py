@@ -101,6 +101,6 @@ class Brain(Sensor):
         self.target.x = np.random.randint(0, self.world.width)
         self.target.y = np.random.randint(0, self.world.height)
         targets = [self.target]
-        weights = [self.resolution * 0.1 * (abs(x - self.target.x) + abs(y - self.target.y))/ (self.world.width + self.world.height)]
+        weights = [self.resolution * 0.05 * (abs(x - self.target.x) + abs(y - self.target.y))/ (self.world.width + self.world.height)]
         return targets, weights
 

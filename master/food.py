@@ -30,7 +30,7 @@ class Food(Entity):
         if self.world.round >= self.bday + self.foodtype.shelflife:
             self.disappear()
 
-rpf = 5
+rpf = 6
 foodtypes = [ ]
 
 class Distributor:
