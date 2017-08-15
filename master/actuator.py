@@ -34,13 +34,13 @@ class Actuator:
         self.steps = self.pathfind()
 
     def pathfind(self):
-        dest= None
-        fringe= []
-        closed= []
+        dest = None
+        fringe = []
+        closed = set()
         heapq.heappush(fringe,(self.estimateddistance(self.agent.x, self.agent.y),(self.agent.x, self.agent.y, 0, None)))
-        while len(fringe)!=0:
+        while len(fringe) != 0:
             f, cell = heapq.heappop(fringe)
-            closed.append((cell[0],cell[1]))
+            closed.add((cell[0],cell[1]))
             if cell[0] == self.goal.x and cell[1] == self.goal.y:
                 dest=cell
                 break
@@ -51,7 +51,6 @@ class Actuator:
                    (cell[0], cell[1]-1,cell[2]+1,cell))
 
             for n in nbs:
-
                 if self.agent.world.walkable(n[0], n[1]) == True and (n[0],n[1]) not in closed:
                     f=n[2]+self.estimateddistance(n[0], n[1])
                     heapq.heappush(fringe,(f,n))
@@ -63,9 +62,10 @@ class Actuator:
         ret=[]
         while True:
             ret.append((dest[0],dest[1]))
-            dest= dest[3]
-            if dest== None:
+            dest = dest[3]
+            if dest == None:
                 break
+
         ret.reverse()
         return ret
 

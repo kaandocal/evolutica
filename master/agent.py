@@ -26,8 +26,8 @@ class Agent(Entity):
         self.children = []
         self.image = load_image("agent")
 
-    def addsensor(self, sensor):
-        self.sensors.append(sensor)
+    def addsensor(self, type, resolution):
+        self.sensors.append(type(self.world, resolution))
 
     # updates agents
     # (should later call Sensor and Actuator
@@ -57,8 +57,8 @@ class Agent(Entity):
             sstr_s = sensor.resolution + np.random.normal(0, 1)
             sstr_d = sensor.resolution + np.random.normal(0, 1)
 
-            s.addsensor(Nose(self.world,sstr_s))
-            d.addsensor(Nose(self.world,sstr_d))
+            s.addsensor(sensor.type, sstr_s)
+            d.addsensor(sensor.type, sstr_d)
 
         energy = self.energy + np.random.randint(50,100)
         share_s = 0.3 + 0.4 * np.random.random_sample()
