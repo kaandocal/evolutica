@@ -1,7 +1,7 @@
 from .entity import Entity
 from .actuator import Actuator
 from .sensor import Sensor, Nose, Ear
-from .food import Food
+from .food import Food, foodtypes
 from .gfx import load_image
 # agent class
 
@@ -13,13 +13,17 @@ class Agent(Entity):
     Emax = 500
     #constructs an agent with x,y coordinates and instantiates an Actuator 
     def __init__(self, world, x, y):
-        Entity.__init__(self, world, x, y, Agent, 0)
+        Entity.__init__(self, world, x, y, Agent)
         self.sensors = []
         self.name = np.random.choice(names)
-        self.food_eaten = []
+        self.food_eaten = {}
+        for ft in foodtypes:
+            self.food_eaten[ft] = 0
         self.last_eaten = -1
+        self.birthday = world.round
         self.energy = int((0.4 + 0.6 * np.random.random_sample())* Agent.Emax)
         self.actuator = Actuator(self)
+        self.children = []
         self.image = load_image("agent")
 
     def addsensor(self, sensor):
@@ -42,6 +46,7 @@ class Agent(Entity):
 
     def die(self):
         print("*{} didn't make it".format(self.name))
+        self.deceased = self.world.round
         self.world.remove_entity(self)
 
     def circleoflife(self):
@@ -52,8 +57,8 @@ class Agent(Entity):
             sstr_s = sensor.resolution + np.random.normal(0, 1)
             sstr_d = sensor.resolution + np.random.normal(0, 1)
 
-            s.addsensor(Nose(sstr_s))
-            d.addsensor(Nose(sstr_d))
+            s.addsensor(Nose(self.world,sstr_s))
+            d.addsensor(Nose(self.world,sstr_d))
 
         energy = self.energy + np.random.randint(50,100)
         share_s = 0.3 + 0.4 * np.random.random_sample()
@@ -63,30 +68,36 @@ class Agent(Entity):
         print("*plop plop*")
         print("{}'s been busy it seems...*".format(self.name))
         print("Happy B-day, {} and {}!".format(s.name, d.name))
+
+        self.children.append(s)
+        self.children.append(d)
+
+        self.deceased = self.world.round
         self.world.remove_entity(self)
 
     def render(self, surf, tile_size):
         surf.blit(self.image, (self.x * tile_size, self.y * tile_size))
-        for sensor in self.sensors:
-            sensor.render(surf, tile_size, self.x, self.y)
 
     def touch(self, other):
-        if other.dead:
+        if other.deceased:
             return
 
         if other.type == Food:
             other.disappear()
             print("{}: *munch munch*".format(self.name))
-            self.food_eaten.append(other)
-            self.energy = min(Agent.Emax, self.energy + other.nutritional_value)
+            self.food_eaten[other.foodtype] += 1
+            self.energy = min(Agent.Emax, self.energy + other.foodtype.nutritional_value)
             self.last_eaten = self.world.round
 
     def dumpfood(self):
         print("--------------------------------------")
         print("Food stats for {}:".format(self.name))
-        print("Total Food Eaten: {}".format(len(self.food_eaten)))
+        total_food = sum([v for v in self.food_eaten.values()])
+        print("Total Food Eaten: {}".format(total_food))
         print("Last Food Eaten: Round {}/{}".format(self.last_eaten, self.world.round))
         print("Energy Reserves: {}".format(self.energy))
+        for ft in foodtypes:
+            print("Amount of {} eaten: {}".format(ft.name, self.food_eaten[ft]))
         print("--------------------------------------")
 
     def dumpsensors(self):

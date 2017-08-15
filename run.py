@@ -5,20 +5,21 @@ import pygame, sys, random
 from pygame.locals import *
 
 #import classes
-from master.gfx import load_image
 from master.entity import Entity
 from master.world import World
 from master.agent import Agent
-from master.sensor import Nose, Ear
-from master.food import Food
-import master.gfx
+from master.sensor import Nose, Ear, Eye, Brain
+from master.food import Food, FoodType
+import master.food as food
+import master.gfx as gfx
+import master.data as data
 
 #constants
 speeds = { K_1: 2, K_2: 5, K_3: 10, K_4: 20, K_5 : 30, K_6 : 40 }
 speed = speeds[K_1]
 TILESIZE = 20
 
-master.gfx.default_size = (TILESIZE,TILESIZE)
+gfx.default_size = (TILESIZE,TILESIZE)
 
 #colours
 BLACK = (0,0,0)
@@ -31,17 +32,24 @@ BLUE = (0,0,200)
 pygame.init()
 fpsClock = pygame.time.Clock()
 
-wall_image = load_image("wall")
+wall_image = gfx.load_image("wall")
 
 #initialize world
 world = World('world')
+food.foodtypes.append(FoodType("burger", 60, 50, smells=True, sounds=False, visible=False))
+food.foodtypes.append(FoodType("orb", 60, 50, smells=False, sounds=True, visible=False))
+food.foodtypes.append(FoodType("blob", 60, 50, smells=False, sounds=False, visible=True))
 smart_one = world.spawn(Agent, 5, 5)
-nose = Nose(resolution=5)
+nose = Nose(world,resolution=10)
 smart_one.addsensor(nose)
-world.spawn(Agent, 5, 6)
+smart_one = world.spawn(Agent, 5, 6)
+eye = Eye(world,resolution=10)
+smart_one.addsensor(eye)
 smart_one = world.spawn(Agent, 20, 20)
-nose = Nose(resolution=12)
-smart_one.addsensor(nose)
+ear = Ear(world,resolution=10)
+smart_one.addsensor(ear)
+brain = Brain(world,resolution=10)
+smart_one.addsensor(brain)
 
 #set up display
 DISP_SURF = pygame.display.set_mode((world.width*TILESIZE, world.height*TILESIZE))
@@ -74,11 +82,13 @@ while True:
                 speed = speeds[key]
             #dump game data
             elif key == K_s:
-                world.dump()
+                data.dump(world)
             elif key == K_i:
-                world.sensorinfo()
+                data.sensorinfo(world)
             elif key == K_f:
-                world.foodinfo()
+                data.foodinfo(world)
+            elif key == K_r:
+                data.hof(world)
     #draw grid
     DISP_SURF.fill(BLACK)
     for row in range(world.height):

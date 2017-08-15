@@ -14,7 +14,7 @@ class Actuator:
         weights = []
 
         for sensor in self.agent.sensors:
-            ts, ws = sensor.sense(self.agent.world, self.agent.x, self.agent.y)
+            ts, ws = sensor.sense(self.agent.x, self.agent.y)
             targets += ts
             weights += ws
 
@@ -27,6 +27,10 @@ class Actuator:
         #choose random target according to weight
         z = np.sum(weights)
         self.goal = np.random.choice(targets, p = np.asarray(weights) / z)
+        if self.goal.type == None:
+            print("{} wonders what's at ({},{})...".format(self.agent.name, self.goal.x,self.goal.y))
+        else:
+            print("{} found {}!".format(self.agent.name, self.goal.name))
         self.steps = self.pathfind()
 
     def pathfind(self):
@@ -41,7 +45,11 @@ class Actuator:
                 dest=cell
                 break
 
-            nbs= ((cell[0], cell[1]+1,cell[2]+1,cell),(cell[0]+1, cell[1],cell[2]+1,cell),(cell[0]-1, cell[1],cell[2]+1,cell),(cell[0], cell[1]-1,cell[2]+1,cell))
+            nbs = ((cell[0], cell[1]+1,cell[2]+1,cell),\
+                   (cell[0]+1, cell[1],cell[2]+1,cell),\
+                   (cell[0]-1, cell[1],cell[2]+1,cell),\
+                   (cell[0], cell[1]-1,cell[2]+1,cell))
+
             for n in nbs:
 
                 if self.agent.world.walkable(n[0], n[1]) == True and (n[0],n[1]) not in closed:
@@ -61,11 +69,9 @@ class Actuator:
         ret.reverse()
         return ret
 
-
     def estimateddistance(self, xcur, ycur):
-        manhattan=abs(self.goal.x-xcur)+abs(self.goal.y-ycur)
+        manhattan = abs(self.goal.x-xcur)+abs(self.goal.y-ycur)
         return manhattan
-
 
             
 # act function. Randomly moves agent in one direction.

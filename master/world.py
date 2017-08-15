@@ -2,7 +2,6 @@ from .agent import Agent
 from .food import Food, Distributor
 from .entity import Entity
 from .gfx import load_image
-import pickle
 import numpy as np
 import pygame
 
@@ -18,6 +17,7 @@ class World:
         #world array which contains the entities and its copy
         self.entities = []
         self.remove_list = []
+        self.halloffame = []
         self.distributor = Distributor(self)
         self.tiles = np.zeros((self.width,self.height),dtype='uint32')
 
@@ -47,10 +47,12 @@ class World:
         
         ent = constructor(self,x,y,*args,**kwargs)
         self.entities.append(ent)
+        if ent.type == Agent:
+            self.halloffame.append(ent)
         return ent
 
     def remove_entity(self, ent):
-        ent.dead = True
+        ent.deceased = self.round
         self.remove_list.append(ent)
 
     #updates all entities and the world grid
@@ -70,26 +72,3 @@ class World:
         self.round += 1
         return
 
-    def dump(self):
-        i = 0
-        while True:
-            filename = "saves/save{}".format(i)
-            try:
-                out = file(filename, "rb")
-            except IOError:
-                break
-            i += 1
-
-        out = file(filename, "wb")
-        pickle.dump(self, out)
-        print("Saved game data to file '{}'".format(filename))
-
-    def foodinfo(self):
-        for ent in self.entities:
-            if ent.type == Agent:
-                ent.dumpfood()
-
-    def sensorinfo(self):
-        for ent in self.entities:
-            if ent.type == Agent:
-                ent.dumpsensors()

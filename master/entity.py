@@ -2,13 +2,13 @@ class Entity:
 
     # x und y geben die Koordinaten des Objekt Entity an (Typ Integer)
     # wenn walkable == 1, kann man das Feld der Entity betreten. Wenn 0, dann nicht
-    def __init__(self, world, x, y, type = None, walkable = 1):
+    def __init__(self, world, x, y, type = None):
+            self.name = None
             self.world = world
             self.type = type
             self.x = x
             self.y = y
-            self.walkable = walkable
-            self.dead = False
+            self.deceased = None
 
     # update function
     # should be implemented by each child class of Entity
@@ -20,3 +20,7 @@ class Entity:
 
     def touch(self, other):
         pass
+
+class Ghost(Entity):
+    def __init__(self, world, x, y):
+        Entity.__init__(self, world, x, y, None)
