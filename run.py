@@ -15,7 +15,7 @@ import master.gfx
 
 #constants
 speeds = { K_1: 2, K_2: 5, K_3: 10, K_4: 20, K_5 : 30, K_6 : 40 }
-speed = speeds[K_3]
+speed = speeds[K_1]
 TILESIZE = 20
 
 master.gfx.default_size = (TILESIZE,TILESIZE)
@@ -39,8 +39,9 @@ smart_one = world.spawn(Agent, 5, 5)
 nose = Smell(resolution=5)
 smart_one.addsensor(nose)
 world.spawn(Agent, 5, 6)
-world.spawn(Agent, 5, 6)
-world.spawn(Agent, 5, 6)
+smart_one = world.spawn(Agent, 20, 20)
+nose = Smell(resolution=12)
+smart_one.addsensor(nose)
 
 #set up display
 DISP_SURF = pygame.display.set_mode((world.width*TILESIZE, world.height*TILESIZE))

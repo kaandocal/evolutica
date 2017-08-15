@@ -8,6 +8,7 @@ class Entity:
             self.x = x
             self.y = y
             self.walkable = walkable
+            self.dead = False
 
     # update function
     # should be implemented by each child class of Entity

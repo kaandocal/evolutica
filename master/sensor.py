@@ -22,9 +22,9 @@ class Smell(Sensor):
             dist = np.sqrt((x - ent.x) ** 2 + (y - ent.y) ** 2)
             #strength of smell is dependent on the distance and the resolution of the sensor
             strength = self.resolution - dist
-            if strength >= 1:
+            if strength >= 1 and world.walkable(ent.x, ent.y):
                 targets.append(ent)
-                weights.append(np.floor(strength))
+                weights.append(strength)
 
         return targets, weights
 

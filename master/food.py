@@ -33,4 +33,5 @@ class Distributor:
             shelflife = np.random.randint(50,100)
             x = np.random.randint(1,self.world.width - 1)
             y = np.random.randint(1,self.world.height - 1)
-            food = self.world.spawn(Food,x,y,shelflife=shelflife)
+            if self.world.walkable(x,y):
+                food = self.world.spawn(Food,x,y,shelflife=shelflife)

@@ -50,6 +50,7 @@ class World:
         return ent
 
     def remove_entity(self, ent):
+        ent.dead = True
         self.remove_list.append(ent)
 
     #updates all entities and the world grid

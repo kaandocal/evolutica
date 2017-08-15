@@ -47,6 +47,9 @@ class Agent(Entity):
             sensor.render(surf, tile_size, self.x, self.y)
 
     def touch(self, other):
+        if other.dead:
+            return
+
         if other.type == Food:
             other.disappear()
             print("{}: *munch munch*".format(self.name))
