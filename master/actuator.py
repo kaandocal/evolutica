@@ -1,5 +1,5 @@
 import numpy as np
-
+import heapq
 # Actuator of an agent (incomplete) 
 class Actuator:
     def __init__(self, agent):
@@ -28,6 +28,44 @@ class Actuator:
         #choose random target according to weight
         z = np.sum(weights)
         self.goal = np.random.choice(targets, p = np.asarray(weights) / z)
+
+    def pathfind(self):
+        dest= None
+        fringe= []
+        closed= []
+        heapq.heappush(fringe,(self.estimateddistance(self.x, self.y),(self.x, self.y, 0, None)))
+        while len(fringe)!=0:
+            f, cell = heapq.heappop(fringe)
+            closed.append((cell[0],cell[1]))
+            if cell[0] == self.goal.x and cell[1] == self.goal.y:
+                dest=cell
+                break
+
+            nbs= ((cell[0], cell[1]+1,cell[2]+1,cell),(cell[0]+1, cell[1],cell[2]+1,cell),(cell[0]-1, cell[1],cell[2]+1,cell),(cell[0], cell[1]-1,cell[2]+1,cell))
+            for n in nbs:
+
+                if self.agent.world.walkable(n[0], n[1]) == True and (n[0],n[1]) not in closed:
+                    f=n[2]+estimateddistance(n[0], n[1])
+                    heapq.heappush(fringe,(f,n))
+            
+
+        if dest == None:
+            return None
+
+        ret=[]
+        while True:
+            ret.append((dest[0],dest[1]))
+            dest= dest[3]
+            if dest== None:
+                break
+        return ret.reverse()
+
+
+    def estimateddistance(self, xcur, ycur):
+        manhattan=abs(self.goal.x-xcur)+abs(self.goal.y-ycur)
+        return manhattan
+
+
             
 # act function. Randomly moves agent in one direction.
 # receives x,y, the current coordinates of the agent
