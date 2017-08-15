@@ -39,10 +39,8 @@ smart_one = world.spawn(Agent, 5, 5)
 nose = Smell(resolution=5)
 smart_one.addsensor(nose)
 world.spawn(Agent, 5, 6)
-world.spawn(Food, 7, 7)
-world.spawn(Food, 10, 7)
-world.spawn(Food, 15, 14)
-world.spawn(Food, 14, 7)
+world.spawn(Agent, 5, 6)
+world.spawn(Agent, 5, 6)
 
 #set up display
 DISP_SURF = pygame.display.set_mode((world.width*TILESIZE, world.height*TILESIZE))
@@ -76,6 +74,8 @@ while True:
             #dump game data
             elif key == K_s:
                 world.dump()
+            elif key == K_f:
+                world.foodinfo()
     #draw grid
     DISP_SURF.fill(BLACK)
     for row in range(world.height):

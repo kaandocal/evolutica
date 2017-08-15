@@ -1,5 +1,5 @@
 from .agent import Agent
-from .food import Food
+from .food import Food, Distributor
 from .entity import Entity
 from .gfx import load_image
 import pickle
@@ -18,11 +18,14 @@ class World:
         #world array which contains the entities and its copy
         self.entities = []
         self.remove_list = []
+        self.distributor = Distributor(self)
         self.tiles = np.zeros((self.width,self.height),dtype='uint32')
 
         #build wall around world
         self.tiles[0,:] = self.tiles[-1,:] = World.TILE_WALL
         self.tiles[:,0] = self.tiles[:,-1] = World.TILE_WALL
+
+        self.round = 0
 
         for i in range(self.width):
             for j in range(self.height):
@@ -33,7 +36,7 @@ class World:
         return self.tiles[x,y] != World.TILE_WALL
 
     # Spawns entities
-    def spawn(self, constructor, x, y):
+    def spawn(self, constructor, x, y, *args, **kwargs):
         if x < 0 or x >= self.width or y < 0 or y >= self.height:
             print("Warning: Trying to spawn entity outside world")
             return
@@ -42,7 +45,7 @@ class World:
         if self.tiles[x,y] == World.TILE_WALL:
             pass
         
-        ent = constructor(self,x,y)
+        ent = constructor(self,x,y,*args,**kwargs)
         self.entities.append(ent)
         return ent
 
@@ -61,6 +64,8 @@ class World:
         for ent in self.remove_list:
             self.entities.remove(ent) 
         self.remove_list = []
+        self.distributor.update()
+        self.round += 1
         return
 
     def dump(self):
@@ -76,3 +81,8 @@ class World:
         out = file(filename, "wb")
         pickle.dump(self, out)
         print("Saved game data to file '{}'".format(filename))
+
+    def foodinfo(self):
+        for ent in self.entities:
+            if ent.type == Agent:
+                ent.dumpfood()
