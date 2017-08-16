@@ -8,7 +8,7 @@ from pygame.locals import *
 from master.entity import Entity
 from master.world import World
 from master.agent import Agent
-from master.sensor import Nose, Ear, Eye, Brain
+from master.sensor import Nose, Ear, Eye, Brain, sensortypes
 from master.food import Food, FoodType
 import master.food as food
 import master.gfx as gfx
@@ -34,19 +34,59 @@ fpsClock = pygame.time.Clock()
 
 wall_image = gfx.load_image("wall")
 
-#initialize world
-world = World('world')
+def init_world(filename):
+    inp = open(filename, "r")
+    world = World('world')
+    for l in inp.readlines():
+        words = l.split(' ')
+        if len(words) == 0:
+            continue
+
+        if words[0] == "Agent":
+            if len(words) < 3:
+                print("Warning: Cannot parse line '{}'".format(l))
+
+            x = int(words[1])
+            y = int(words[2])
+
+            world.spawn(Agent, x, y)
+        elif words[0] == "Sensor":
+            if len(world.entities) == 0:
+                print("Warning: Adding sensors to non-entity")
+
+            if len(words) < 3:
+                print("Warning: Cannot parse line '{}'".format(l))
+
+            res = float(words[2])
+
+            ent = world.entities[-1]
+            
+            success = False
+            for st in sensortypes:
+                if words[1] == st.name:
+                    ent.addsensor(st, resolution=res)
+                    success = True
+                    break
+
+            if not success:
+                print("Warning: Cannot parse line '{}'".format(l))
+
+        elif words[0] == "Food":
+            if len(words) < 2:
+                print("Warning: Cannot parse line '{}'".format(l))
+
+            world.distributor.fpr = float(words[1])
+
+        else:
+            print("Warning: Cannot parse line '{}'".format(l))
+
+    return world
+
 food.foodtypes.append(FoodType("burger", 300, 50, smells=True, sounds=False, visible=False))
 food.foodtypes.append(FoodType("orb", 300, 50, smells=False, sounds=True, visible=False))
 food.foodtypes.append(FoodType("blob", 300, 50, smells=False, sounds=False, visible=True))
-smart_one = world.spawn(Agent, 5, 5)
-smart_one.addsensor(Nose, resolution=8)
-smart_one = world.spawn(Agent, 5, 6)
-smart_one.addsensor(Eye, resolution=8)
-smart_one.addsensor(Brain, resolution=8)
-smart_one = world.spawn(Agent, 20, 30)
-smart_one.addsensor(Ear, resolution=8)
-smart_one.addsensor(Brain, resolution=8)
+
+world = init_world("brainvsnone")
 
 #set up display
 DISP_SURF = pygame.display.set_mode((world.width*TILESIZE, world.height*TILESIZE))
