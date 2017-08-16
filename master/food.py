@@ -30,15 +30,15 @@ class Food(Entity):
         if self.world.round >= self.bday + self.foodtype.shelflife:
             self.disappear()
 
-rpf = 6
 foodtypes = [ ]
 
 class Distributor:
-    def __init__(self, world):
+    def __init__(self, world, fpr = 6):
         self.world = world
+        self.fpr = fpr
 
     def update(self):
-        if np.random.randint(0,rpf) == 0:
+        if np.random.random_sample() <= self.fpr:
             foodtype = np.random.choice(foodtypes)
             x = np.random.randint(1,self.world.width - 1)
             y = np.random.randint(1,self.world.height - 1)

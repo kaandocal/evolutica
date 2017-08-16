@@ -104,3 +104,5 @@ class Brain(Sensor):
         weights = [self.resolution * 0.05 * (abs(x - self.target.x) + abs(y - self.target.y))/ (self.world.width + self.world.height)]
         return targets, weights
 
+
+sensortypes = [ Nose, Eye, Ear, Brain ]

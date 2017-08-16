@@ -5,7 +5,7 @@ images = {}
 default_size = None
 
 def load_image(name, size = None):
-    if not images.has_key(name):
+    if not name in images.keys():
         img = pygame.image.load('img/{}.bmp'.format(name))
         images[name] = img
 

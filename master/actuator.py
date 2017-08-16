@@ -1,3 +1,7 @@
+#import pyximport
+#pyximport.install()
+#from . import cylib
+
 import numpy as np
 import heapq
 # Actuator of an agent (incomplete) 

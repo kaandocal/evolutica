@@ -54,8 +54,8 @@ class Agent(Entity):
         d = self.world.spawn(Agent, self.x, self.y)
 
         for sensor in self.sensors:
-            sstr_s = sensor.resolution + np.random.normal(0, 2)
-            sstr_d = sensor.resolution + np.random.normal(0, 2)
+            sstr_s = sensor.resolution + np.random.normal(0, 1.5)
+            sstr_d = sensor.resolution + np.random.normal(0, 1.5)
 
             s.addsensor(sensor.type, sstr_s)
             d.addsensor(sensor.type, sstr_d)
