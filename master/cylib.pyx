@@ -1,4 +1,5 @@
 import heapq
+cimport numpy as np
 
 cdef int estimateddistance(act, int xcur, int ycur):
     cdef int manhattan = abs(act.goal.x-xcur)+abs(act.goal.y-ycur)
@@ -9,6 +10,10 @@ def pathfind(act):
     fringe = []
     closed = set()
     pathdata = {}
+    cdef int world_w = act.agent.world.width
+    cdef int world_h = act.agent.world.height
+    cdef np.ndarray[unsigned int,ndim=2] tiles = act.agent.world.tiles
+
     heapq.heappush(fringe,(estimateddistance(act, act.agent.x, act.agent.y),(act.agent.x, act.agent.y)))
     pathdata[(act.agent.x,act.agent.y)] = (0,None)
     while len(fringe) != 0:
@@ -24,7 +29,7 @@ def pathfind(act):
                (cell[0], cell[1]-1))
 
         for n in nbs:
-            if act.agent.world.walkable(n[0], n[1]) == True and (n[0],n[1]) not in closed:
+            if (n[0] >= 0 and n[0] < world_w) and (n[1] >= 0 and n[1] < world_h) and tiles[n[0],n[1]] == 0 and (n[0],n[1]) not in closed:
                 if (f,cell) in fringe:
                     continue
 

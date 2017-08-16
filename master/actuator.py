@@ -1,6 +1,9 @@
-#import pyximport
-#pyximport.install()
-#from . import cylib
+use_cython = False
+
+if use_cython:
+    import pyximport
+    pyximport.install()
+    from . import cylib
 
 import numpy as np
 import heapq
@@ -58,6 +61,7 @@ class Actuator:
         z = np.sum(weights)
         self.goal = np.random.choice(targets, p = np.asarray(weights) / z)
         self.steps = self.pathfind()
+        #self.steps = cylib.pathfind(self)
         if self.goal.type == None:
             print("{} wonders what's at ({},{})...".format(self.agent.name, self.goal.x,self.goal.y))
         else:
@@ -68,6 +72,8 @@ class Actuator:
         fringe = []
         closed = set()
         pathdata = {}
+        world_w = self.agent.world.width
+        world_h = self.agent.world.height
         heapq.heappush(fringe,(self.estimateddistance(self.agent.x, self.agent.y),(self.agent.x, self.agent.y)))
         pathdata[(self.agent.x,self.agent.y)] = (0,None)
         while len(fringe) != 0:
@@ -83,7 +89,7 @@ class Actuator:
                    (cell[0], cell[1]-1))
 
             for n in nbs:
-                if self.agent.world.walkable(n[0], n[1]) == True and (n[0],n[1]) not in closed:
+                if (n[0] >= 0 and n[0] < world_w) and (n[1] >= 0 and n[1] < world_h) and self.agent.world.tiles[n[0],n[1]] == 0 and (n[0],n[1]) not in closed:
                     if (f,cell) in fringe:
                         continue
 
@@ -137,7 +143,7 @@ class Actuator:
             self.reflect()
         else:   
             if self.goal.type == None:
-                a = min(0, 300 - self.agent.energy) / 300.0
+                a = min(0, 400 - self.agent.energy) / 400.0
                 if np.random.random_sample() <= a:
                     self.doubt()
             step = self.steps[0]
