@@ -1,7 +1,7 @@
 from .agent import Agent
 from .food import Food, Distributor
 from .entity import Entity
-from .gfx import load_image
+from .gfx import load_image, get_image
 import numpy as np
 import pygame
 
@@ -11,7 +11,7 @@ class World:
 
     def __init__(self, filename):
         worldmap = load_image(filename, (0,0))
-        worldmap = worldmap.convert(8)
+        worldmap = get_image(worldmap).convert(8)
         self.width, self.height = worldmap.get_size()
 
         #world array which contains the entities and its copy

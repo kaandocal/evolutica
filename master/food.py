@@ -1,6 +1,6 @@
 import numpy as np
 from .entity import Entity
-from .gfx import load_image
+from .gfx import load_image, get_image
 
 class FoodType:
     def __init__(self, name, shelflife, nutritional_value, smells, sounds, visible):
@@ -24,7 +24,7 @@ class Food(Entity):
         self.world.remove_entity(self)
 
     def render(self, surf, tile_size):
-        surf.blit(self.foodtype.image, (self.x * tile_size, self.y * tile_size))
+        surf.blit(get_image(self.foodtype.image), (self.x * tile_size, self.y * tile_size))
 
     def update(self):
         if self.world.round >= self.bday + self.foodtype.shelflife:

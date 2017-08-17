@@ -33,7 +33,7 @@ BLUE = (0,0,200)
 pygame.init()
 fpsClock = pygame.time.Clock()
 
-wall_image = gfx.load_image("wall")
+wall_image = gfx.get_image(gfx.load_image("wall"))
 
 def init_world(filename):
     inp = open(filename, "r")
@@ -84,7 +84,7 @@ def init_world(filename):
     return world
 
 food.foodtypes.append(FoodType("burger", 300, 50, smells=True, sounds=False, visible=False))
-food.foodtypes.append(FoodType("chiken", 300, 50, smells=False, sounds=True, visible=False))
+food.foodtypes.append(FoodType("chicken", 300, 50, smells=False, sounds=True, visible=False))
 food.foodtypes.append(FoodType("apple", 300, 50, smells=False, sounds=False, visible=True))
 
 world = init_world("brainvsnone")
@@ -104,6 +104,7 @@ while True:
     for event in pygame.event.get():
         #if the user wants to quit
         if event.type == QUIT:
+            data.dump(world)
             pygame.quit()
             sys.exit()
         #user clicks on an entity or a tile

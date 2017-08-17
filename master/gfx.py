@@ -9,7 +9,11 @@ def load_image(name, size = None):
         img = pygame.image.load('img/{}.bmp'.format(name))
         images[name] = img
 
-    img = images[name]
+    return (name, size)
+
+def get_image(t):
+    img = images[t[0]]
+    size = t[1]
     if size == (0,0):
         return img
     elif size == None:

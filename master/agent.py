@@ -2,7 +2,7 @@ from .entity import Entity
 from .actuator import Actuator
 from .sensor import Sensor, Nose, Ear, Brain, Eye
 from .food import Food, foodtypes
-from .gfx import load_image
+from .gfx import load_image, get_image
 # agent class
 
 import numpy as np
@@ -31,7 +31,7 @@ class Agent(Entity):
         if type == Brain:
             self.image = load_image("brainy")
         self.sensors.append(type(self.world, resolution))
-        self.metabolic_cost += max(0, resolution - 3) * 0.1
+        self.metabolic_cost += max(0, resolution - 3) * 0.05
 
     # updates agents
     # (should later call Sensor and Actuator
@@ -80,7 +80,7 @@ class Agent(Entity):
         self.world.remove_entity(self)
 
     def render(self, surf, tile_size):
-        surf.blit(self.image, (self.x * tile_size, self.y * tile_size))
+        surf.blit(get_image(self.image), (self.x * tile_size, self.y * tile_size))
 
     def touch(self, other):
         if other.deceased:
@@ -92,6 +92,25 @@ class Agent(Entity):
             self.food_eaten[other.foodtype] += 1
             self.energy = min(Agent.Emax, self.energy + other.foodtype.nutritional_value)
             self.last_eaten = self.world.round
+
+    def dumpbio(self):
+        if self.deceased:
+            print("--------------------------------------")
+            print("Fondly remembering {}".format(self.name))
+            print("(Round {} - Round {})".format(self.birthday, self.deceased))
+            if len(self.children) != 0:
+                print("{} gave us two beautiful children: {} and {}".format(self.name, self.children[0].name, self.children[1].name))
+            else:
+                print("Poor {} starved to death in a cruel world...".format(self.name))
+
+            print("--------------------------------------")
+        else:
+            print("--------------------------------------")
+            print("Proudly presenting {}".format(self.name))
+            print("Born in Round {}".format(self.birthday))
+            print("We all wish the best for {}".format(self.name))
+            print("--------------------------------------")
+        print("--------------------------------------")
 
     def dumpfood(self):
         print("--------------------------------------")
