@@ -24,6 +24,7 @@ gfx.default_size = (TILESIZE,TILESIZE)
 #colours
 BLACK = (0,0,0)
 WHITE = (255,255,255)
+DARK_GRAY = (100,100,100)
 RED = (200, 0, 0)
 GREEN = (0,200,0)
 BLUE = (0,0,200)
@@ -83,8 +84,8 @@ def init_world(filename):
     return world
 
 food.foodtypes.append(FoodType("burger", 300, 50, smells=True, sounds=False, visible=False))
-food.foodtypes.append(FoodType("orb", 300, 50, smells=False, sounds=True, visible=False))
-food.foodtypes.append(FoodType("blob", 300, 50, smells=False, sounds=False, visible=True))
+food.foodtypes.append(FoodType("chiken", 300, 50, smells=False, sounds=True, visible=False))
+food.foodtypes.append(FoodType("apple", 300, 50, smells=False, sounds=False, visible=True))
 
 world = init_world("brainvsnone")
 
@@ -133,7 +134,7 @@ while True:
             if world.tiles[column,row] == World.TILE_WALL:
                 DISP_SURF.blit(wall_image, (column * TILESIZE, row * TILESIZE))
             #add a white square (drawing surface, colour, coordinates, border thickness)
-            pygame.draw.rect(DISP_SURF, WHITE, (column*TILESIZE, row*TILESIZE, TILESIZE,TILESIZE), 1)
+            #pygame.draw.rect(DISP_SURF, DARK_GRAY, (column*TILESIZE, row*TILESIZE, TILESIZE + 1,TILESIZE + 1), 1)
     #update the display
     if speed != 0:
         fpsClock.tick(speed)

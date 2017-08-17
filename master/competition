@@ -1,0 +1,16 @@
+Agent 5 5
+Sensor Nose 7
+Agent 25 5
+Sensor Nose 5
+Sensor Brain 5
+Agent 15 15
+Sensor Ear 7
+Agent 25 15
+Sensor Ear 5
+Sensor Brain 5
+Agent 20 20
+Sensor Eye 7
+Agent 20 15
+Sensor Eye 5
+Sensor Brain 5
+Food 0.2

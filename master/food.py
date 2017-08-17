@@ -33,7 +33,7 @@ class Food(Entity):
 foodtypes = [ ]
 
 class Distributor:
-    def __init__(self, world, fpr = 6):
+    def __init__(self, world, fpr = 0.5):
         self.world = world
         self.fpr = fpr
 

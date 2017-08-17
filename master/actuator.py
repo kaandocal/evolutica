@@ -143,7 +143,7 @@ class Actuator:
             self.reflect()
         else:   
             if self.goal.type == None:
-                a = min(0, 400 - self.agent.energy) / 400.0
+                a = min(0, 500 - self.agent.energy) / 500.0
                 if np.random.random_sample() <= a:
                     self.doubt()
             step = self.steps[0]

@@ -1,6 +1,6 @@
 from .entity import Entity
 from .actuator import Actuator
-from .sensor import Sensor, Nose, Ear
+from .sensor import Sensor, Nose, Ear, Brain, Eye
 from .food import Food, foodtypes
 from .gfx import load_image
 # agent class
@@ -15,6 +15,7 @@ class Agent(Entity):
     def __init__(self, world, x, y):
         Entity.__init__(self, world, x, y, Agent)
         self.sensors = []
+        self.metabolic_cost = 1
         self.name = np.random.choice(names)
         self.food_eaten = {}
         for ft in foodtypes:
@@ -27,7 +28,10 @@ class Agent(Entity):
         self.image = load_image("agent")
 
     def addsensor(self, type, resolution):
+        if type == Brain:
+            self.image = load_image("brainy")
         self.sensors.append(type(self.world, resolution))
+        self.metabolic_cost += max(0, resolution - 3) * 0.1
 
     # updates agents
     # (should later call Sensor and Actuator
@@ -37,7 +41,7 @@ class Agent(Entity):
             self.x = x
             self.y = y
 
-        self.energy -= 1
+        self.energy -= self.metabolic_cost
         if self.energy <= 0:
             self.die()
         p_offspring = max(0, (self.energy - 350) / 4500.)
@@ -54,8 +58,8 @@ class Agent(Entity):
         d = self.world.spawn(Agent, self.x, self.y)
 
         for sensor in self.sensors:
-            sstr_s = sensor.resolution + np.random.normal(0, 1.5)
-            sstr_d = sensor.resolution + np.random.normal(0, 1.5)
+            sstr_s = sensor.resolution + np.random.normal(0, 1)
+            sstr_d = sensor.resolution + np.random.normal(0, 1)
 
             s.addsensor(sensor.type, sstr_s)
             d.addsensor(sensor.type, sstr_d)
@@ -95,7 +99,7 @@ class Agent(Entity):
         total_food = sum([v for v in self.food_eaten.values()])
         print("Total Food Eaten: {}".format(total_food))
         print("Last Food Eaten: Round {}/{}".format(self.last_eaten, self.world.round))
-        print("Energy Reserves: {}".format(self.energy))
+        print("Energy Reserves: {:.1f}".format(self.energy))
         for ft in foodtypes:
             print("Amount of {} eaten: {}".format(ft.name, self.food_eaten[ft]))
         print("--------------------------------------")
@@ -104,5 +108,5 @@ class Agent(Entity):
         print("--------------------------------------")
         print("Sensor stats for {}:".format(self.name))
         for s in self.sensors:
-            print("{}: {}/15".format(s.name,s.resolution))
+            print("{}: {:.1f}/15".format(s.name,s.resolution))
         print("--------------------------------------")
