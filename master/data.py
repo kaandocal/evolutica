@@ -2,6 +2,7 @@ from .world import World
 from .agent import Agent
 import pickle
 
+# Pickles the world into a file
 def dump(self):
     i = 0
     while True:

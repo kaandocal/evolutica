@@ -13,6 +13,7 @@ class Sensor():
     def sense(self, pos):
         pass
 
+# The next three sensors are identical but for their names
 class Nose(Sensor):
     name = "Nose"
 
@@ -34,17 +35,6 @@ class Nose(Sensor):
                     weights.append(strength)
 
         return targets, weights
-
-    def render(self, surf, tile_size, x, y):
-        return
-        temp_surf = pygame.Surface(surf.get_size())
-        xpos = int((x + 0.5) * tile_size)
-        ypos = int((y + 0.5) * tile_size)
-        temp_surf.set_alpha(128)
-        colors = [pygame.Color(255, 0, 0), pygame.Color(255,100,100), pygame.Color(255,200,200) ]
-        for r, c in zip(np.linspace(0, self.resolution * tile_size,4)[:0:-1], colors):
-            pygame.draw.circle(temp_surf, c, (xpos, ypos), int(r))
-        surf.blit(temp_surf, (0,0))
  
 class Ear(Sensor):
     name = "Ear"
@@ -90,6 +80,7 @@ class Eye(Sensor):
 
         return targets, weights
 
+# This is a bit different
 class Brain(Sensor):
     name = "Brain"
 
@@ -101,6 +92,7 @@ class Brain(Sensor):
         self.target.x = np.random.randint(0, self.world.width)
         self.target.y = np.random.randint(0, self.world.height)
         targets = [self.target]
+        # Preference given to faraway targets (why?)
         weights = [self.resolution * 0.05 * (abs(x - self.target.x) + abs(y - self.target.y))/ (self.world.width + self.world.height)]
         return targets, weights
 

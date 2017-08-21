@@ -1,7 +1,6 @@
 class Entity:
 
     # x und y geben die Koordinaten des Objekt Entity an (Typ Integer)
-    # wenn walkable == 1, kann man das Feld der Entity betreten. Wenn 0, dann nicht
     def __init__(self, world, x, y, type = None):
             self.name = None
             self.world = world
@@ -21,6 +20,7 @@ class Entity:
     def touch(self, other):
         pass
 
+# Imaginary targets used by the brain
 class Ghost(Entity):
     def __init__(self, world, x, y):
         Entity.__init__(self, world, x, y, None)

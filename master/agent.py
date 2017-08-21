@@ -10,31 +10,36 @@ import numpy as np
 names = [ 'Larry', 'Patrick', 'Hannah', 'Angelina', 'Bert', 'Margaret', 'Bob', 'Vicky', 'Oliver', 'Emily', 'Lil\' Ron', 'Jackie', 'Katy P', 'Dieter', 'Elias', 'Alex', 'Mike', 'Gabe', 'Moe', 'Hazel', 'Bella', 'Aubrey', 'Penelope', 'Lizzie', 'Ed', 'Em']
 
 class Agent(Entity):
+    # Maximal energy an entity can store
+
     Emax = 500
-    #constructs an agent with x,y coordinates and instantiates an Actuator 
+    # constructs an agent with x,y coordinates and instantiates an Actuator 
     def __init__(self, world, x, y):
         Entity.__init__(self, world, x, y, Agent)
         self.sensors = []
         self.metabolic_cost = 1
+        self.energy = int((0.4 + 0.6 * np.random.random_sample())* Agent.Emax)
+        self.actuator = Actuator(self)
+        self.image = load_image("agent")
+
+        # For statistical purposes
+        self.children = []
         self.name = np.random.choice(names)
         self.food_eaten = {}
         for ft in foodtypes:
             self.food_eaten[ft] = 0
         self.last_eaten = -1
         self.birthday = world.round
-        self.energy = int((0.4 + 0.6 * np.random.random_sample())* Agent.Emax)
-        self.actuator = Actuator(self)
-        self.children = []
-        self.image = load_image("agent")
 
     def addsensor(self, type, resolution):
         if type == Brain:
             self.image = load_image("brainy")
+
+        assert(0 <= resolution and resolution <= 15)
         self.sensors.append(type(self.world, resolution))
-        self.metabolic_cost += max(0, resolution - 3) * 0.05
+        self.metabolic_cost += resolution * self.world.sensor_cost
 
     # updates agents
-    # (should later call Sensor and Actuator
     def update(self):
         x, y = self.actuator.propose(self.x, self.y)
         if self.world.walkable(x,y):
@@ -44,6 +49,8 @@ class Agent(Entity):
         self.energy -= self.metabolic_cost
         if self.energy <= 0:
             self.die()
+
+        # generate offspring with a probability depending on the energy level
         p_offspring = max(0, (self.energy - 350) / 4500.)
         if np.random.random_sample() <= p_offspring:
             self.circleoflife()
@@ -57,13 +64,15 @@ class Agent(Entity):
         s = self.world.spawn(Agent, self.x, self.y)
         d = self.world.spawn(Agent, self.x, self.y)
 
+        # Pass on the sensors with random mutations
         for sensor in self.sensors:
-            sstr_s = sensor.resolution + np.random.normal(0, 1)
-            sstr_d = sensor.resolution + np.random.normal(0, 1)
+            sstr_s = sensor.resolution + np.random.normal(0, self.world.mutation_variance)
+            sstr_d = sensor.resolution + np.random.normal(0, self.world.mutation_variance)
 
             s.addsensor(sensor.type, sstr_s)
             d.addsensor(sensor.type, sstr_d)
 
+        # Split up the energy between both descendants, including a bonus
         energy = self.energy + np.random.randint(50,100)
         share_s = 0.3 + 0.4 * np.random.random_sample()
         s.energy = int(share_s * energy)
@@ -83,6 +92,7 @@ class Agent(Entity):
         surf.blit(get_image(self.image), (self.x * tile_size, self.y * tile_size))
 
     def touch(self, other):
+        # Gross
         if other.deceased:
             return
 

@@ -14,7 +14,7 @@ class World:
         worldmap = get_image(worldmap).convert(8)
         self.width, self.height = worldmap.get_size()
 
-        #world array which contains the entities and its copy
+        # List containing: currently alive entities, entities that died in the current round, all entities that ever lived
         self.entities = []
         self.remove_list = []
         self.halloffame = []
@@ -27,6 +27,10 @@ class World:
 
         self.round = 0
 
+        self.sensor_cost = 0.09
+        self.mutation_variance = 1
+
+        # Fill in the tiles according to loaded world map file
         for i in range(self.width):
             for j in range(self.height):
                 if worldmap.get_at((i,j)) != (0,0,0):

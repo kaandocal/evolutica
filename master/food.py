@@ -8,12 +8,13 @@ class FoodType:
         self.image = load_image(name)
         self.shelflife = shelflife
         self.nutritional_value = nutritional_value
+
+        # whether this type of food can be smelled, heard or seen
         self.smells = smells
         self.sounds = sounds
         self.visible = visible
 
 class Food(Entity):
-    # constructs Food with coords x,y and kind, which is 0 by default
     def __init__(self, world, x, y, foodtype):
         Entity.__init__(self, world, x, y, Food)
         self.foodtype = foodtype
@@ -27,14 +28,17 @@ class Food(Entity):
         surf.blit(get_image(self.foodtype.image), (self.x * tile_size, self.y * tile_size))
 
     def update(self):
+        # For food safety purposes
         if self.world.round >= self.bday + self.foodtype.shelflife:
             self.disappear()
 
 foodtypes = [ ]
 
+# Class responsible for spawning food at random
 class Distributor:
     def __init__(self, world, fpr = 0.5):
         self.world = world
+        # fpr = Food per round
         self.fpr = fpr
 
     def update(self):

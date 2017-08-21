@@ -35,6 +35,20 @@ fpsClock = pygame.time.Clock()
 
 wall_image = gfx.get_image(gfx.load_image("wall"))
 
+
+if len(sys.argv) < 2:
+    print("Usage: run.py [world file]")
+    exit(1)
+
+world_filename = sys.argv[1]
+
+# World file syntax:
+# Agent X Y - spawn agent at (X,Y)
+# Sensor TYPE RES - add sensor of type TYPE and resolution RES to last spawned agent
+# Option OPTION VALUE - sets global constants. Possible option names are:
+#    MutationVar - variance of mutations during reproduction (sensor resolution)
+#    FoodPerRound - units of food spawned per round (should be between 0 and 1)
+#    SensorCost - amount of energy used by each sensor per round and resolution
 def init_world(filename):
     inp = open(filename, "r")
     world = World('world')
@@ -46,6 +60,7 @@ def init_world(filename):
         if words[0] == "Agent":
             if len(words) < 3:
                 print("Warning: Cannot parse line '{}'".format(l))
+                continue
 
             x = int(words[1])
             y = int(words[2])
@@ -54,9 +69,11 @@ def init_world(filename):
         elif words[0] == "Sensor":
             if len(world.entities) == 0:
                 print("Warning: Adding sensors to non-entity")
+                continue
 
             if len(words) < 3:
                 print("Warning: Cannot parse line '{}'".format(l))
+                continue
 
             res = float(words[2])
 
@@ -72,12 +89,20 @@ def init_world(filename):
             if not success:
                 print("Warning: Cannot parse line '{}'".format(l))
 
-        elif words[0] == "Food":
-            if len(words) < 2:
+
+        elif words[0] == "Option":
+            if len(words) < 3:
                 print("Warning: Cannot parse line '{}'".format(l))
+                continue
 
-            world.distributor.fpr = float(words[1])
-
+            if words[1] == "MutationVar":
+                world.mutation_variance = float(words[2])
+            elif words[1] == "SensorCost":
+                world.sensor_cost = float(words[2])
+            elif words[1] == "FoodPerRound":
+                world.distributor.fpr = float(words[2])
+            else:
+                print("Warning: Cannot parse line '{}'".format(l))
         else:
             print("Warning: Cannot parse line '{}'".format(l))
 
@@ -134,8 +159,6 @@ while True:
         for column in range(world.width):
             if world.tiles[column,row] == World.TILE_WALL:
                 DISP_SURF.blit(wall_image, (column * TILESIZE, row * TILESIZE))
-            #add a white square (drawing surface, colour, coordinates, border thickness)
-            #pygame.draw.rect(DISP_SURF, DARK_GRAY, (column*TILESIZE, row*TILESIZE, TILESIZE + 1,TILESIZE + 1), 1)
     #update the display
     if speed != 0:
         fpsClock.tick(speed)
